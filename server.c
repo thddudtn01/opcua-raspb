@@ -70,8 +70,9 @@ writeTraffic(UA_Server *Server,
                  const UA_NodeId *sessionId, void *sessionContext,
                  const UA_NodeId *nodeId, void *nodeContext,
                  const UA_NumericRange *range, const UA_DataValue *data) {;
-    shmaddr[nodeId->identifier.numeric - 43000] = (char*)data->value.data+'0';
-    printf("%c", shmaddr+(nodeId->identifier.numeric - 43000));
+    shmaddr[nodeId->identifier.numeric - 43000] = *(char*)(data->value.data)+'0';
+    //shmaddr[nodeId->identifier.numeric - 43000] = '0';
+    printf("%c\n", shmaddr[nodeId->identifier.numeric - 43000]);
     return UA_STATUSCODE_GOOD;
 }
 
@@ -97,7 +98,7 @@ int main(int argc, char** argv) {
     attr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
     attr.dataType = UA_TYPES[UA_TYPES_INT32].typeId;
     scaleTestDataSource.read = readTraffic;
-    scaleTestDataSource.read = writeTraffic;
+    scaleTestDataSource.write = writeTraffic;
     attr.displayName = UA_LOCALIZEDTEXT("en-US", "green");
     UA_QualifiedName qualifiedName = UA_QUALIFIEDNAME(1, "green");
     retval = UA_Server_addDataSourceVariableNode(server, UA_NODEID_NUMERIC(1, 43000),
@@ -112,7 +113,7 @@ int main(int argc, char** argv) {
     attr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
     attr.dataType = UA_TYPES[UA_TYPES_INT32].typeId;
     scaleTestDataSource.read = readTraffic;
-    scaleTestDataSource.read = writeTraffic;
+    scaleTestDataSource.write = writeTraffic;
     attr.displayName = UA_LOCALIZEDTEXT("en-US", "yellow");
     qualifiedName = UA_QUALIFIEDNAME(1, "yellow");
     retval = UA_Server_addDataSourceVariableNode(server, UA_NODEID_NUMERIC(1, 43001),
@@ -127,7 +128,7 @@ int main(int argc, char** argv) {
     attr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
     attr.dataType = UA_TYPES[UA_TYPES_INT32].typeId;
     scaleTestDataSource.read = readTraffic;
-    scaleTestDataSource.read = writeTraffic;
+    scaleTestDataSource.write = writeTraffic;
     attr.displayName = UA_LOCALIZEDTEXT("en-US", "red");
     qualifiedName = UA_QUALIFIEDNAME(1, "red");
     retval = UA_Server_addDataSourceVariableNode(server, UA_NODEID_NUMERIC(1, 43002),
