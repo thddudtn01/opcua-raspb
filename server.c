@@ -28,10 +28,6 @@ void shmemHandler(){
        perror("shmctl failed");
        exit(1);
     }
-//    if(shmdt(shmaddr) == -1) {
-//       perror("shmdt failed");
-//       exit(1);
-//    }
 }
 
 void signalHandler(int signo){
@@ -42,20 +38,13 @@ void signalHandler(int signo){
     exit(0);
 }
 
-static const UA_NodeId baseDataVariableType = { 0, UA_NODEIDTYPE_NUMERIC, {UA_NS0ID_BASEDATAVARIABLETYPE} };
 static UA_StatusCode
 readTraffic(UA_Server* server,
     const UA_NodeId* sessionId, void* sessionContext,
     const UA_NodeId* nodeId, void* nodeContext,
     UA_Boolean sourceTimeStamp,
     const UA_NumericRange* range, UA_DataValue* value) {
-    if (range) {
-        value->hasStatus = true;
-        value->status = UA_STATUSCODE_BADINDEXRANGEINVALID;
-        return UA_STATUSCODE_GOOD;
-    }
     UA_Int32 toggle = (UA_Int32)(shmaddr[nodeId->identifier.numeric - 43000]-'0');
-
     UA_Variant_setScalarCopy(&value->value, &toggle, &UA_TYPES[UA_TYPES_INT32]);
     value->hasValue = true;
     if (sourceTimeStamp) {
@@ -71,8 +60,6 @@ writeTraffic(UA_Server *Server,
                  const UA_NodeId *nodeId, void *nodeContext,
                  const UA_NumericRange *range, const UA_DataValue *data) {;
     shmaddr[nodeId->identifier.numeric - 43000] = *(char*)(data->value.data)+'0';
-    //shmaddr[nodeId->identifier.numeric - 43000] = '0';
-    printf("%c\n", shmaddr[nodeId->identifier.numeric - 43000]);
     return UA_STATUSCODE_GOOD;
 }
 
@@ -90,52 +77,52 @@ int main(int argc, char** argv) {
     UA_ServerConfig_setDefault(UA_Server_getConfig(server));
 
     shmemHandler();
-        
-    UA_DataSource scaleTestDataSource;
-    scaleTestDataSource.read = NULL;
-    scaleTestDataSource.write = NULL;
+
+    UA_DataSource trafficDataSource;
+    trafficDataSource.read = NULL;
+    trafficDataSource.write = NULL;
     UA_VariableAttributes attr = UA_VariableAttributes_default;
     attr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
     attr.dataType = UA_TYPES[UA_TYPES_INT32].typeId;
-    scaleTestDataSource.read = readTraffic;
-    scaleTestDataSource.write = writeTraffic;
+    trafficDataSource.read = readTraffic;
+    trafficDataSource.write = writeTraffic;
     attr.displayName = UA_LOCALIZEDTEXT("en-US", "green");
     UA_QualifiedName qualifiedName = UA_QUALIFIEDNAME(1, "green");
     retval = UA_Server_addDataSourceVariableNode(server, UA_NODEID_NUMERIC(1, 43000),
         UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER),
         UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES), qualifiedName,
         UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE),
-        attr, scaleTestDataSource, NULL, NULL);
+        attr, trafficDataSource, NULL, NULL);
 
-    scaleTestDataSource.read = NULL;
-    scaleTestDataSource.write = NULL;
+    trafficDataSource.read = NULL;
+    trafficDataSource.write = NULL;
     attr = UA_VariableAttributes_default;
     attr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
     attr.dataType = UA_TYPES[UA_TYPES_INT32].typeId;
-    scaleTestDataSource.read = readTraffic;
-    scaleTestDataSource.write = writeTraffic;
+    trafficDataSource.read = readTraffic;
+    trafficDataSource.write = writeTraffic;
     attr.displayName = UA_LOCALIZEDTEXT("en-US", "yellow");
     qualifiedName = UA_QUALIFIEDNAME(1, "yellow");
     retval = UA_Server_addDataSourceVariableNode(server, UA_NODEID_NUMERIC(1, 43001),
         UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER),
         UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES), qualifiedName,
         UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE),
-        attr, scaleTestDataSource, NULL, NULL);
+        attr, trafficDataSource, NULL, NULL);
 
-    scaleTestDataSource.read = NULL;
-    scaleTestDataSource.write = NULL;
+    trafficDataSource.read = NULL;
+    trafficDataSource.write = NULL;
     attr = UA_VariableAttributes_default;
     attr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
     attr.dataType = UA_TYPES[UA_TYPES_INT32].typeId;
-    scaleTestDataSource.read = readTraffic;
-    scaleTestDataSource.write = writeTraffic;
+    trafficDataSource.read = readTraffic;
+    trafficDataSource.write = writeTraffic;
     attr.displayName = UA_LOCALIZEDTEXT("en-US", "red");
     qualifiedName = UA_QUALIFIEDNAME(1, "red");
     retval = UA_Server_addDataSourceVariableNode(server, UA_NODEID_NUMERIC(1, 43002),
         UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER),
         UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES), qualifiedName,
         UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE),
-        attr, scaleTestDataSource, NULL, NULL);
+        attr, trafficDataSource, NULL, NULL);
 
     retval = UA_Server_run(server, &running);
 
