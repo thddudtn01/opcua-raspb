@@ -104,7 +104,7 @@ int main(int argc, char** argv) {
     attr.dataType = UA_TYPES[UA_TYPES_INT32].typeId;
     scaleTestDataSource.read = readRandomInt32Data;
     attr.displayName = UA_LOCALIZEDTEXT("en-US", "yellow");
-    UA_QualifiedName qualifiedName = UA_QUALIFIEDNAME(1, "yellow");
+    qualifiedName = UA_QUALIFIEDNAME(1, "yellow");
     retval = UA_Server_addDataSourceVariableNode(server, UA_NODEID_NUMERIC(1, 43001),
         UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER),
         UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES), qualifiedName,
@@ -118,14 +118,14 @@ int main(int argc, char** argv) {
     attr.dataType = UA_TYPES[UA_TYPES_INT32].typeId;
     scaleTestDataSource.read = readRandomInt32Data;
     attr.displayName = UA_LOCALIZEDTEXT("en-US", "red");
-    UA_QualifiedName qualifiedName = UA_QUALIFIEDNAME(1, "red");
+    qualifiedName = UA_QUALIFIEDNAME(1, "red");
     retval = UA_Server_addDataSourceVariableNode(server, UA_NODEID_NUMERIC(1, 43002),
         UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER),
         UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES), qualifiedName,
         UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE),
         attr, scaleTestDataSource, NULL, NULL);
 
-    retval = UA_Server_run(server, &running);}
+    retval = UA_Server_run(server, &running);
 
     UA_Server_delete(server);
     return (int)retval;

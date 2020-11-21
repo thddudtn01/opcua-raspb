@@ -2,7 +2,7 @@ import sysv_ipc
 import RPi.GPIO as GPIO
 import time
 
-memory = sysv_ipc.SharedMemory( 777, flags=01000, size=12 ,mode=0600)
+memory = sysv_ipc.SharedMemory( 777, flags=01000, size=10, mode=0600)
 memory.write("000")
 
 GPIO.setmode(GPIO.BCM)
