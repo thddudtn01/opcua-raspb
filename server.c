@@ -15,18 +15,15 @@ char *shmaddr;
 struct shmid_ds shm_stat;
 
 void shmemHandler(){
-    if((shmid=shmget((key_t)777, 12, IPC_CREAT|0666)) == -1) {
+    if((shmid=shmget((key_t)777, 10, IPC_CREAT|0666)) == -1) {
        perror("shmid failed");
        exit(1);
     }
-
     if((shmaddr=shmat(shmid, (void *)0, 0)) == (void *)-1) {
        perror("shmat failed");
        exit(1);
     }
-
     printf("data read from shared memory : %s\n", (char *)shmaddr);
-
     if(shmctl(shmid, IPC_STAT, &shm_stat) == -1) {
        perror("shmctl failed");
        exit(1);
@@ -57,7 +54,8 @@ readTraffic(UA_Server* server,
         value->status = UA_STATUSCODE_BADINDEXRANGEINVALID;
         return UA_STATUSCODE_GOOD;
     }
-    UA_Int32 toggle = shmaddr[nodeId.identifier.numeric - 43000] - '0';
+//    UA_Int32 toggle = shmaddr[nodeId->identifier.numeric - 43000] - '0';
+    UA_Int32 toggle = shmaddr+(nodeId->identifier.numeric - 43000) - '0';
     UA_Variant_setScalarCopy(&value->value, &toggle, &UA_TYPES[UA_TYPES_INT32]);
     value->hasValue = true;
     if (sourceTimeStamp) {
@@ -88,7 +86,7 @@ int main(int argc, char** argv) {
     UA_VariableAttributes attr = UA_VariableAttributes_default;
     attr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
     attr.dataType = UA_TYPES[UA_TYPES_INT32].typeId;
-    scaleTestDataSource.read = readRandomInt32Data;
+    scaleTestDataSource.read = readTraffic;
     attr.displayName = UA_LOCALIZEDTEXT("en-US", "green");
     UA_QualifiedName qualifiedName = UA_QUALIFIEDNAME(1, "green");
     retval = UA_Server_addDataSourceVariableNode(server, UA_NODEID_NUMERIC(1, 43000),
@@ -99,10 +97,10 @@ int main(int argc, char** argv) {
 
     scaleTestDataSource.read = NULL;
     scaleTestDataSource.write = NULL;
-    UA_VariableAttributes attr = UA_VariableAttributes_default;
+    attr = UA_VariableAttributes_default;
     attr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
     attr.dataType = UA_TYPES[UA_TYPES_INT32].typeId;
-    scaleTestDataSource.read = readRandomInt32Data;
+    scaleTestDataSource.read = readTraffic;
     attr.displayName = UA_LOCALIZEDTEXT("en-US", "yellow");
     qualifiedName = UA_QUALIFIEDNAME(1, "yellow");
     retval = UA_Server_addDataSourceVariableNode(server, UA_NODEID_NUMERIC(1, 43001),
@@ -113,10 +111,10 @@ int main(int argc, char** argv) {
 
     scaleTestDataSource.read = NULL;
     scaleTestDataSource.write = NULL;
-    UA_VariableAttributes attr = UA_VariableAttributes_default;
+    attr = UA_VariableAttributes_default;
     attr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
     attr.dataType = UA_TYPES[UA_TYPES_INT32].typeId;
-    scaleTestDataSource.read = readRandomInt32Data;
+    scaleTestDataSource.read = readTraffic;
     attr.displayName = UA_LOCALIZEDTEXT("en-US", "red");
     qualifiedName = UA_QUALIFIEDNAME(1, "red");
     retval = UA_Server_addDataSourceVariableNode(server, UA_NODEID_NUMERIC(1, 43002),

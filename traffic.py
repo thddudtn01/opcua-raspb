@@ -17,15 +17,15 @@ try:
         light = memory.read()
         if(light[0] == "1"):
             GPIO.output(23, True)
-        else
+        else:
             GPIO.output(23, False)
         if(light[1] == '1'):
             GPIO.output(24, True)
-        else
+        else:
             GPIO.output(24, False)
         if(light[2] == '1'):
             GPIO.output(25, True)
-        else
+        else:
             GPIO.output(25, False)
         time.sleep(0.1)
 
