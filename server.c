@@ -54,11 +54,8 @@ readTraffic(UA_Server* server,
         value->status = UA_STATUSCODE_BADINDEXRANGEINVALID;
         return UA_STATUSCODE_GOOD;
     }
-//    UA_Int32 toggle = shmaddr[nodeId->identifier.numeric - 43000] - '0';
     UA_Int32 toggle = (UA_Int32)(shmaddr[nodeId->identifier.numeric - 43000]-'0');
-    //printf("%c\n", toggle);
-    //printf("%s\n", (char*)shmaddr);
-    //printf("%c\n", (char*)shmaddr[nodeId->identifier.numeric - 43000]);
+
     UA_Variant_setScalarCopy(&value->value, &toggle, &UA_TYPES[UA_TYPES_INT32]);
     value->hasValue = true;
     if (sourceTimeStamp) {
@@ -72,8 +69,8 @@ static UA_StatusCode
 writeTraffic(UA_Server *Server,
                  const UA_NodeId *sessionId, void *sessionContext,
                  const UA_NodeId *nodeId, void *nodeContext,
-                 const UA_NumericRange *range, const UA_DataValue *data) {
-    //*shmaddr+(nodeId->identifier.numeric - 43000) = (char*)data->value.data+'0';
+                 const UA_NumericRange *range, const UA_DataValue *data) {;
+    shmaddr[nodeId->identifier.numeric - 43000] = (char*)data->value.data+'0';
     printf("%c", shmaddr+(nodeId->identifier.numeric - 43000));
     return UA_STATUSCODE_GOOD;
 }
@@ -100,7 +97,7 @@ int main(int argc, char** argv) {
     attr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
     attr.dataType = UA_TYPES[UA_TYPES_INT32].typeId;
     scaleTestDataSource.read = readTraffic;
-//    scaleTestDataSource.read = writeTraffic;
+    scaleTestDataSource.read = writeTraffic;
     attr.displayName = UA_LOCALIZEDTEXT("en-US", "green");
     UA_QualifiedName qualifiedName = UA_QUALIFIEDNAME(1, "green");
     retval = UA_Server_addDataSourceVariableNode(server, UA_NODEID_NUMERIC(1, 43000),
@@ -115,7 +112,7 @@ int main(int argc, char** argv) {
     attr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
     attr.dataType = UA_TYPES[UA_TYPES_INT32].typeId;
     scaleTestDataSource.read = readTraffic;
-//    scaleTestDataSource.read = writeTraffic;
+    scaleTestDataSource.read = writeTraffic;
     attr.displayName = UA_LOCALIZEDTEXT("en-US", "yellow");
     qualifiedName = UA_QUALIFIEDNAME(1, "yellow");
     retval = UA_Server_addDataSourceVariableNode(server, UA_NODEID_NUMERIC(1, 43001),
@@ -130,7 +127,7 @@ int main(int argc, char** argv) {
     attr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
     attr.dataType = UA_TYPES[UA_TYPES_INT32].typeId;
     scaleTestDataSource.read = readTraffic;
-//    scaleTestDataSource.read = writeTraffic;
+    scaleTestDataSource.read = writeTraffic;
     attr.displayName = UA_LOCALIZEDTEXT("en-US", "red");
     qualifiedName = UA_QUALIFIEDNAME(1, "red");
     retval = UA_Server_addDataSourceVariableNode(server, UA_NODEID_NUMERIC(1, 43002),
