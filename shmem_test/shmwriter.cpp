@@ -14,7 +14,7 @@ class CSharedMemroy
  
 private :
     
-    int m_shmid;   
+    void *m_shmid;   
     key_t m_key;
     char *m_shared_memory;
  
