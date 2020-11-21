@@ -2,8 +2,8 @@ import sysv_ipc
 import RPi.GPIO as GPIO
 import time
 
-memory = sysv_ipc.SharedMemory( 777, flags=01000, size=10 ,mode=0600)
-memory.write("3")
+memory = sysv_ipc.SharedMemory( 777, flags=01000, size=12 ,mode=0600)
+memory.write("000")
 
 GPIO.setmode(GPIO.BCM)
 
@@ -17,16 +17,16 @@ try:
         light = memory.read()
         if(light[0] == "1"):
             GPIO.output(23, True)
-            GPIO.output(24, False)
-            GPIO.output(25, False)
-        if(light[0] == '2'):
+        else
             GPIO.output(23, False)
+        if(light[1] == '1'):
             GPIO.output(24, True)
-            GPIO.output(25, False)
-        if(light[0] == '3'):
-            GPIO.output(23, False)
+        else
             GPIO.output(24, False)
+        if(light[2] == '1'):
             GPIO.output(25, True)
+        else
+            GPIO.output(25, False)
         time.sleep(0.1)
 
 except KeyboardInterrupt:
